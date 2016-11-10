@@ -1,0 +1,38 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE configuration PUBLIC "-//mybatis.org//DTD Config 3.0//EN" "http://mybatis.org/dtd/mybatis-3-config.dtd">
+<configuration>
+    <environments default="development">
+        <environment id="development">
+            <transactionManager type="JDBC"/>
+            <!-- 配置数据库连接信息 -->
+            <dataSource type="POOLED">
+                <property name="driver" value="com.mysql.jdbc.Driver"/>
+                <property name="url"
+                          value="jdbc:mysql://10.37.57.29:3306/enn_application?useUnicode=true&amp;characterEncoding=UTF-8"/>
+                <property name="username" value="root"/>
+                <property name="password" value="admin123"/>
+                <property name="poolPingQuery" value="SELECT * FROM a_yl_realtime_car_m_half"/>
+                <property name="poolPingEnabled" value="true"/>
+            </dataSource>
+        </environment>
+        <environment id="development2">
+            <transactionManager type="JDBC"/>
+            <!-- 配置数据库连接信息 -->
+            <dataSource type="POOLED">
+                <property name="driver" value="com.mysql.jdbc.Driver"/>
+                <property name="url"
+                          value="jdbc:mysql://10.37.57.29:3306/eqpt_base_db?useUnicode=true&amp;characterEncoding=UTF-8"/>
+                <property name="username" value="root"/>
+                <property name="password" value="admin123"/>
+                <property name="poolPingQuery" value="SELECT * FROM t_cc_tank_total_remote"/>
+                <property name="poolPingEnabled" value="true"/>
+            </dataSource>
+        </environment>
+    </environments>
+    <mappers>
+        <!-- 注册userMapper.xml文件，
+           userMapper.xml位于me.gacl.mapping这个包下，所以resource写成me/gacl/mapping/userMapper.xml-->
+        <mapper resource="carMapper.xml"/>
+    </mappers>
+
+</configuration>

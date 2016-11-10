@@ -1,0 +1,14 @@
+com\enn\main\Main.class
+com\enn\util\HttpClientUtil.class
+com\enn\service\SqlSentence.class
+com\enn\util\GeographyPoint.class
+com\enn\Singleton\MybatisHelper$MybatisSingleton.class
+com\enn\service\UpdateCar.class
+com\enn\mapping\CarMapper.class
+com\enn\Singleton\MybatisHelper.class
+com\enn\service\MapServiceImpl.class
+com\enn\util\FormatTime.class
+com\enn\util\Analysis.class
+com\enn\domain\TankCar.class
+com\enn\domain\RealtimeCar.class
+com\enn\service\MapService.class

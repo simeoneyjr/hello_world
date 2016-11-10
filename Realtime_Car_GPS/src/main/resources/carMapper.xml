@@ -1,0 +1,100 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<!-- 为这个mapper指定一个唯一的namespace，namespace的值习惯上设置成包名+sql映射文件名，这样就能够保证namespace的值是唯一的
+ 例如namespace="me.gacl.mapping.userMapper"就是me.gacl.mapping(包名)+userMapper(userMapper.xml文件去除后缀)
+ -->
+<mapper namespace="com.enn.mapping.CarMapper">
+    <!-- 在select标签中编写查询的SQL语句， 设置select标签的id属性为getUser，id属性值必须是唯一的，不能够重复
+    使用parameterType属性指明查询时使用的参数类型，resultType属性指明查询返回的结果集类型
+    resultType="me.gacl.domain.User"就表示将查询结果封装成一个User类的对象返回
+    User类就是users表所对应的实体类
+    -->
+    <!--
+        根据id查询得到一个user对象
+        select a.car_no,a.postition_x,a.postition_y,a.liquid,a.save_time
+        from eqpt_base_db.t_cc_tank_total_remote  a
+        where ( select count(*)
+        from eqpt_base_db.t_cc_tank_total_remote
+        where car_no = a.car_no and save_time > a.save_time)<2
+        order by a.car_no,a.save_time desc;
+     -->
+    <select id="getrealtimeCar"  resultType="com.enn.domain.RealtimeCar">
+        select * from enn_application.a_yl_realtime_car_m_half
+    </select>
+<!--
+    <select id="getTankcar"  resultType="com.enn.domain.TankCar">
+        select *
+        from eqpt_base_db.t_cc_tank_total_remote  a
+        where ( select count(*)
+        from eqpt_base_db.t_cc_tank_total_remote
+        where car_no = a.car_no and save_time > a.save_time )&lt;1
+        and  a.car_no&lt;&gt;'' and car_no is not null
+        order by a.car_no,a.save_time desc;
+    </select> -->
+    <select id="getTankcar"  resultType="com.enn.domain.TankCar">
+        select *
+        from eqpt_base_db.t_cc_tank_total_remote_2;
+    </select>
+
+    <select id="gethistoryrealtimeCar"  resultType="com.enn.domain.RealtimeCar">
+        SELECT
+        *
+        FROM
+        (
+        select *
+        from a_yl_realtime_car_m_half_history  a
+        where TIME> date_add(now(),interval -90 minute) and	( select count(*)
+					from a_yl_realtime_car_m_half_history
+					where TRUCK_TOU_NO = a.TRUCK_TOU_NO and TIME > a.TIME)&lt;2
+        and  a.LIQUID_LEVEL&lt;1 and (a.TASK_STATE='4' or a.TASK_STATE='4I')
+        and a.LIQUID_LEVEL!=''
+        ) t1
+        where( select count(*)
+        from (select *
+        from a_yl_realtime_car_m_half_history  a
+        where TIME> date_add(now(),interval -90 minute) and ( select count(*)
+					from a_yl_realtime_car_m_half_history
+					where TRUCK_TOU_NO = a.TRUCK_TOU_NO and TIME > a.TIME )&lt;2
+        and  a.LIQUID_LEVEL&lt;1 and (a.TASK_STATE='4' or a.TASK_STATE='4I') and a.LIQUID_LEVEL!='') t
+        where t.TRUCK_TOU_NO = t1.TRUCK_TOU_NO and t.TIME &lt; t1.TIME )&lt;1;
+    </select>
+
+
+    <insert id="insertCar" parameterType="java.util.List">
+        insert into
+        enn_application.a_yl_realtime_car_m_half
+        values
+        <foreach collection="list" item="item" index="index" separator="," >
+            (#{item.TASK_ID},#{item.TASK_STATE},#{item.IS_TASK},#{item.CAR_STATUS},#{item.LOCATION},#{item.CAR_LOCATION_X},#{item.CAR_LOCATION_Y},#{item.SPEED},#{item.DISTANCE},#{item.SOURCE_DISTANCE},
+            #{item.TEMPERATURE},#{item.TEMPERATRUE_IS_OK},#{item.LIQUID_LEVEL},#{item.LIQUID_IS_OK},#{item.PRESSURE},#{item.PRESSURE_IS_OK},#{item.STORAGES},#{item.STORAGES_IS_OK},#{item.IS_SABOTEUR},#{item.IS_STEALGAS},
+            #{item.PLAN_LOAD_TIME},#{item.PREDICT_LOAD_TIME},#{item.LOAD_BEGIN_TIME},#{item.LOAD_END_TIME},#{item.LOADWARN},#{item.LOADWARNTIME},#{item.PLAN_UNLOAD_TIME},#{item.PREDICT_ARRIVE_TIME},#{item.UNLOAD_BEGIN_TIME},#{item.UNLOAD_END_TIME},
+            #{item.ARRIVEWARN},#{item.ARRIVEWARNTIME},#{item.PROVIDER_ID},#{item.PROVIDER_NAME},#{item.DRIVER_NAME},#{item.DRIVER_PHONE},#{item.TRUCK_TOU_NO},#{item.TRUCK_PAI_NO},
+            #{item.SOURCE_NAME},#{item.SOURCE_LOCATION_X},#{item.SOURCE_LOCATION_Y},#{item.STATION_NAME},#{item.STATION_LOCATION_X},#{item.STATION_LOCATION_Y},#{item.TIME})       </foreach>
+    </insert>
+
+    <insert id="insertHistoryCar" parameterType="java.util.List">
+        insert into
+        enn_application.a_yl_realtime_car_m_half_history
+        values
+        <foreach collection="list" item="item" index="index" separator="," >
+            (#{item.TASK_ID},#{item.TASK_STATE},#{item.IS_TASK},#{item.CAR_STATUS},#{item.LOCATION},#{item.CAR_LOCATION_X},#{item.CAR_LOCATION_Y},#{item.SPEED},#{item.DISTANCE},#{item.SOURCE_DISTANCE},
+            #{item.TEMPERATURE},#{item.TEMPERATRUE_IS_OK},#{item.LIQUID_LEVEL},#{item.LIQUID_IS_OK},#{item.PRESSURE},#{item.PRESSURE_IS_OK},#{item.STORAGES},#{item.STORAGES_IS_OK},#{item.IS_SABOTEUR},#{item.IS_STEALGAS},
+            #{item.PLAN_LOAD_TIME},#{item.PREDICT_LOAD_TIME},#{item.LOAD_BEGIN_TIME},#{item.LOAD_END_TIME},#{item.LOADWARN},#{item.LOADWARNTIME},#{item.PLAN_UNLOAD_TIME},#{item.PREDICT_ARRIVE_TIME},#{item.UNLOAD_BEGIN_TIME},#{item.UNLOAD_END_TIME},
+            #{item.ARRIVEWARN},#{item.ARRIVEWARNTIME},#{item.PROVIDER_ID},#{item.PROVIDER_NAME},#{item.DRIVER_NAME},#{item.DRIVER_PHONE},#{item.TRUCK_TOU_NO},#{item.TRUCK_PAI_NO},
+            #{item.SOURCE_NAME},#{item.SOURCE_LOCATION_X},#{item.SOURCE_LOCATION_Y},#{item.STATION_NAME},#{item.STATION_LOCATION_X},#{item.STATION_LOCATION_Y},#{item.TIME})       </foreach>
+    </insert>
+
+    <delete id="deleteCar">
+        delete from enn_application.a_yl_realtime_car_m_half  where 1=1
+    </delete>
+
+    <delete id="deleteold">
+        DELETE from a_yl_realtime_car_m_half where time &lt;&gt;
+        (
+        select a.time from
+        (
+        select time from a_yl_realtime_car_m_half ORDER BY TIME desc limit 1
+        ) a
+        );
+    </delete>
+</mapper>
